@@ -2,7 +2,7 @@
 build/
 
 # Fichiers d'apprentissage
-roadmap.md
+apprentissage/
 
 # Editeur
 .clangd
