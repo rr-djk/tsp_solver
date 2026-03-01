@@ -1,1 +1,9 @@
+# C++
+build/
+
+# Fichiers d'apprentissage
 roadmap.md
+
+# Editeur
+.clangd
+compile_commands.json
