@@ -21,6 +21,13 @@ Ce n’est pas simplement un problème de “plus court chemin” entre deux poi
 
 Référence : https://en.wikipedia.org/wiki/Travelling_salesman_problem
 
+## Prérequis
+
+- Système Linux
+- g++ 14
+- Support de C++23
+- Optionnel (pour reproduire les résultats de profiling) : `sudo apt install linux-tools-common linux-tools-generic valgrind`
+
 ## Sources de données
 
 Les villes utilisées proviennent du dépôt TSPLIB : https://github.com/mastqe/tsplib/tree/master
