@@ -12,3 +12,11 @@ Il s’agit d’un projet personnel et pédagogique visant à :
 
 
 L’objectif n’est pas simplement d’obtenir une solution fonctionnelle, mais de comprendre en profondeur le comportement des algorithmes, leurs limites, et leurs implications pratiques.
+
+## Définition du TSP
+
+Dans ce projet, le TSP consiste à prendre un ensemble de villes (points fournis dans un fichier) et à déterminer l’ordre optimal dans lequel les visiter afin de minimiser la distance totale d’un tour complet, en commençant et en terminant à la même ville.
+
+Ce n’est pas simplement un problème de “plus court chemin” entre deux points : il faut déterminer le meilleur ordre global de visite parmi toutes les possibilités.
+
+Référence : https://en.wikipedia.org/wiki/Travelling_salesman_problem
