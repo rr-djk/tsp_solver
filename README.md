@@ -2,7 +2,7 @@
 
 ## Objectif
 
-Ce projet a pour but d’implémenter et d’explorer différentes approches pour résoudre le problème du voyageur de commerce (TSP — Traveling Salesman Problem).
+Ce projet a pour but d’implémenter et d’explorer différentes approches pour résoudre le problème du voyageur de commerce (TSP - Traveling Salesman Problem).
 
 Il s’agit d’un projet personnel et pédagogique visant à :
 
@@ -20,3 +20,7 @@ Dans ce projet, le TSP consiste à prendre un ensemble de villes (points fournis
 Ce n’est pas simplement un problème de “plus court chemin” entre deux points : il faut déterminer le meilleur ordre global de visite parmi toutes les possibilités.
 
 Référence : https://en.wikipedia.org/wiki/Travelling_salesman_problem
+
+## Sources de données
+
+Les villes utilisées proviennent du dépôt TSPLIB : https://github.com/mastqe/tsplib/tree/master
