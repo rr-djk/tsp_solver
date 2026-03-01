@@ -41,3 +41,31 @@ num_ville coordX coordY
 - `berlin52.tsp` : 52 villes à Berlin
 - `ch150.tsp` : 150 villes en Suisse
 - Et d'autres instances de tailles variées (127 à 85900 villes)
+
+## Paramètres CLI
+
+```
+- `--input_file`
+  Fichier `.tsp` à charger (instance TSPLIB contenant les coordonnées des villes).
+
+- `--output_file`
+  Fichier JSON où sont exportées les métriques (coût, temps, statistiques, etc.).
+
+- `--algo`
+  Algorithme à exécuter (ex : `nn`, `2opt`, `bnb`, etc.).
+
+- `--all-start`
+  Exécute l’algorithme en démarrant depuis chaque ville (0 → n-1).
+
+- `--quiet`
+  Réduit l’affichage terminal au strict minimum.
+
+- `--repeat`
+  Répète l’exécution complète k fois pour obtenir des mesures stables.
+
+- `--threads`
+  Nombre de threads utilisés pour paralléliser les runs indépendants.
+
+- `--time_limit <ms|s>`
+  Temps maximal autorisé avant arrêt anticipé de l’algorithme.
+```
