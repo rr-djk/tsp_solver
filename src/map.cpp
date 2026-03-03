@@ -1,9 +1,18 @@
 #include "map.hpp"
+#include <cstddef>
 #include <cstdio>
 #include <stdexcept>
 #include <string>
 
 const std::vector<City> &Map::getCities() const { return cities; }
+
+double Map::distance(std::size_t index_city_a, std::size_t index_city_b) const {
+  return cities.at(index_city_a).distanceTo(cities.at(index_city_b));
+}
+
+std::size_t Map::size() const { return cities.size(); }
+
+bool Map::is_empty() const { return cities.empty(); }
 
 std::istream &operator>>(std::istream &is, Map &map) {
   std::string line;
