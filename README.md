@@ -29,6 +29,39 @@ Référence : https://en.wikipedia.org/wiki/Travelling_salesman_problem
 - Optionnel (pour reproduire les résultats de profiling) : `sudo apt install linux-tools-common linux-tools-generic valgrind`
 - Optionnel (pour les tests unitaires) : `sudo apt install libgtest-dev`
 
+## Build et exécution
+
+```bash
+make          # compile le binaire dans build/tsp_parser
+make test     # compile et exécute les tests unitaires
+make clean    # supprime le répertoire build/
+```
+
+### Exécution
+
+```bash
+./build/tsp_parser <fichier.tsp>
+```
+
+**Exemple :**
+
+```bash
+./build/tsp_parser data/berlin52.tsp
+```
+
+**Sortie actuelle :**
+
+```
+=== Évaluation TSP ===
+Nombre de villes    : 52
+Coût du tour        : 23741.1234
+Temps d'évaluation  : 42µs
+```
+
+Le programme génère un tour aléatoire sur les villes du fichier et affiche son coût euclidien total ainsi que le temps de calcul. Le tour est différent à chaque exécution.
+
+---
+
 ## Sources de données
 
 Les villes utilisées proviennent du dépôt TSPLIB : https://github.com/mastqe/tsplib/tree/master
