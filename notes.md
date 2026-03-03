@@ -42,6 +42,50 @@ num_ville coordX coordY
 - `ch150.tsp` : 150 villes en Suisse
 - Et d'autres instances de tailles variées (127 à 85900 villes)
 
+## `Map` vs `Tour` : rôles et relation
+
+### `Map` - le problème (données statiques)
+
+`Map` représente **l'ensemble des villes et leur géographie**. Elle est chargée une seule fois depuis un fichier `.tsp` et ne change jamais pendant l'exécution.
+
+- Contient un `vector<City>`, chaque `City` ayant un `id` TSPLIB et des coordonnées `(x, y)`.
+- Les villes sont indexées **par position dans le vecteur** (`0..n-1`), indépendamment de leur `id` TSPLIB (qui commence à 1).
+- Expose `distance(i, j)` pour calculer la distance euclidienne entre deux villes via leur index interne.
+- Se remplit via `operator>>` (lecture d'un flux `.tsp`).
+
+> `Map` = la carte du monde. Elle ne sait rien des chemins qu'on va emprunter.
+
+### `Tour` - une solution (données variables)
+
+`Tour` représente **un ordre de visite des villes**, c'est-à-dire une solution candidate au problème TSP.
+
+- Contient un `vector<int>` d'**indices internes** (`0..n-1`), **pas** les ids TSPLIB.
+- L'ordre est une permutation : chaque ville apparaît exactement une fois.
+- Expose `is_valid(n)` pour vérifier que la permutation est cohérente avec une `Map` de taille `n`.
+- Ne contient aucune coordonnée ni distance : il ne sait pas ce que représentent les indices, seulement leur ordre.
+
+> `Tour` = un itinéraire sur la carte. Il ne connaît pas la carte, seulement l'ordre de passage.
+
+### Relation entre `Map` et `Tour`
+
+Les deux classes sont **volontairement découplées** : `Tour` ne dépend pas de `Map`. C'est la fonction libre `cost(map, tour)` (dans `evaluator`) qui les réunit :
+
+```
+cost(map, tour)
+  ├── vérifie que tour.is_valid(map.size())
+  └── somme map.distance(ord[i], ord[i+1]) pour i in 0..n-1
+       + retour implicite : map.distance(ord[n-1], ord[0])
+```
+
+Cette séparation permet de :
+- Générer/modifier des `Tour` sans toucher à la `Map`
+- Évaluer n'importe quel `Tour` sur n'importe quelle `Map` de même taille
+- Tester `Tour` et `Map` indépendamment
+
+**Résumé :** `Map` contient *où sont* les villes, `Tour` contient *dans quel ordre* on les visite, et `cost()` mesure la longueur totale du chemin en combinant les deux.
+
+---
+
 ## Paramètres CLI
 
 ```
