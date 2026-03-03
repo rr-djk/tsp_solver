@@ -27,6 +27,7 @@ Référence : https://en.wikipedia.org/wiki/Travelling_salesman_problem
 - g++ 14
 - Support de C++23
 - Optionnel (pour reproduire les résultats de profiling) : `sudo apt install linux-tools-common linux-tools-generic valgrind`
+- Optionnel (pour les tests unitaires) : `sudo apt install libgtest-dev`
 
 ## Sources de données
 
