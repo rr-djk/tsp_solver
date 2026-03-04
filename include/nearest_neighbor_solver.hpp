@@ -7,7 +7,7 @@
 
 class NearestNeighborSolver : public ISolver {
 public:
-  SolveResult solve(const Map &map, const SolveOptions &options);
+  SolveResult solve(const Map &map, const SolveOptions &options) override;
 };
 
 #endif
