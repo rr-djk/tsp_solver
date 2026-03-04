@@ -8,7 +8,7 @@
 
 class Map {
 public:
-  // @return Référence constante vers le vecteur de villes chargées.
+  /** @return Référence constante vers le vecteur de villes chargées. */
   const std::vector<City> &getCities() const;
 
   /**
@@ -20,10 +20,10 @@ public:
    */
   double distance(std::size_t i, std::size_t j) const;
 
-  // @return Nombre de villes chargées dans la carte.
+  /** @return Nombre de villes chargées dans la carte. */
   std::size_t size() const;
 
-  // @return true si aucune ville n'a été chargée, false sinon.
+  /** @return true si aucune ville n'a été chargée, false sinon. */
   bool is_empty() const;
 
 private:
