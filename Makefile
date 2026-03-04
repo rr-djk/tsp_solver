@@ -12,7 +12,7 @@ TEST_EXEC = $(BUILD_DIR)/test_tsp
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SOURCES))
 
-.PHONY: all clean test
+.PHONY: all clean test valgrind
 
 all: $(EXEC)
 
@@ -37,6 +37,9 @@ $(TEST_EXEC): $(LIB_OBJECTS) $(TEST_OBJECTS) | $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+valgrind: $(TEST_EXEC)
+	valgrind --leak-check=full --error-exitcode=1 ./$(TEST_EXEC)
 
 clean:
 	rm -rf $(BUILD_DIR)
