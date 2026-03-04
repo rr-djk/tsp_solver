@@ -16,7 +16,7 @@ public:
    * @param i Index de la première ville dans cities.
    * @param j Index de la deuxième ville dans cities.
    * @return Distance euclidienne entre les villes i et j.
-   * @note Lève std::out_of_range si i ou j sont hors des bornes de cities.
+   * NOTE: Lève std::out_of_range si i ou j sont hors des bornes de cities.
    */
   double distance(std::size_t i, std::size_t j) const;
 
