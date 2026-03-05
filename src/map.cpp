@@ -22,7 +22,7 @@ std::istream &operator>>(std::istream &is, Map &map) {
     if (line.starts_with("DIMENSION")) {
       if (std::sscanf(line.c_str(), "DIMENSION : %u", &dimension) != 1)
         throw std::runtime_error("Ligne DIMENSION mal formatee");
-    } else if (line == "NODE_COORD_SECTION") {
+    } else if (line.starts_with("NODE_COORD_SECTION")) {
       break;
     }
   }
