@@ -1,15 +1,41 @@
 #include <chrono>
+#include <cstdlib>
 #include <exception>
 #include <fstream>
+#include <iostream>
 #include <numeric>
 #include <print>
 #include <random>
+#include <string_view>
 
 #include "evaluator.hpp"
 #include "map.hpp"
 #include "tour.hpp"
 
+[[noreturn]] static void print_help_and_exit() {
+  std::cout
+      << "Usage:\n"
+      << "  tsp_solver --input-file <path> --algo <name> --output-file <path>"
+         " [options]\n\n"
+      << "Obligatoires:\n"
+      << "  --input-file <path>\n"
+      << "  --algo <name>         (nn | 2opt | insertion)\n"
+      << "  --output-file <path>\n\n"
+      << "Optionnels:\n"
+      << "  --all-start\n"
+      << "  --quiet\n"
+      << "  --repeat <k>          (entier >= 1)\n"
+      << "  --threads <t>         (1 <= t <= hardware_concurrency)\n"
+      << "  --time-limit <Ns>     (N entier > 0, suffixe 's', ex: 10s)\n\n"
+      << "Aide:\n"
+      << "  tsp_solver help\n";
+  std::exit(0);
+}
+
 int main(int argc, char *argv[]) {
+  if (argc >= 2 && std::string_view(argv[1]) == "help")
+    print_help_and_exit();
+
   if (argc < 2) {
     std::println(stderr, "Parametres manquants");
     return 1;
