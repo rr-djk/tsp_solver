@@ -110,28 +110,29 @@ On répète jusqu'à inclure toutes les villes.
 
 ## Paramètres CLI
 
-```
-- `--input_file`
-  Fichier `.tsp` à charger (instance TSPLIB contenant les coordonnées des villes).
+### Obligatoires
 
-- `--output_file`
-  Fichier JSON où sont exportées les métriques (coût, temps, statistiques, etc.).
+| Option | Description |
+|---|---|
+| `--input-file <path>` | Fichier `.tsp` TSPLIB à charger |
+| `--algo <name>` | Algorithme à exécuter (`nn`, `2opt`, `insertion`, …) |
+| `--output-file <path>` | Fichier JSON de sortie |
 
-- `--algo`
-  Algorithme à exécuter (ex : `nn`, `2opt`, `bnb`, etc.).
+### Optionnels
 
-- `--all-start`
-  Exécute l’algorithme en démarrant depuis chaque ville (0 → n-1).
+| Option | Description | Contraintes |
+|---|---|---|
+| `--all-start` | Exécute depuis chaque ville de départ | (flag, pas de valeur) |
+| `--quiet` | Affichage minimal | (flag, pas de valeur) |
+| `--repeat <k>` | Répète k fois | `k >= 1`, entier |
+| `--threads <t>` | Nombre de threads | `1 ≤ t ≤ hardware_concurrency()` |
+| `--time-limit <Ns>` | Limite de temps | entier > 0 + `s` minuscule, ex : `10s` |
 
-- `--quiet`
-  Réduit l’affichage terminal au strict minimum.
+### Règles de validation
 
-- `--repeat`
-  Répète l’exécution complète k fois pour obtenir des mesures stables.
+- Option inconnue → erreur
+- Option dupliquée → erreur
+- Valeur attendue mais absente → erreur
+- Valeur hors contrainte → erreur
 
-- `--threads`
-  Nombre de threads utilisés pour paralléliser les runs indépendants.
-
-- `--time_limit <ms|s>`
-  Temps maximal autorisé avant arrêt anticipé de l’algorithme.
-```
+Dans tous les cas : message descriptif affiché, exécution arrêtée immédiatement.
