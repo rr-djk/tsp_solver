@@ -86,6 +86,28 @@ Cette séparation permet de :
 
 ---
 
+## Algorithmes implémentés
+
+### 1. Nearest Neighbor (NN)
+
+On part d'une ville de départ (configurable via `start_city_id`, sinon index 0).
+À chaque étape, on rejoint la ville non visitée la plus proche de la ville courante.
+On répète jusqu'à avoir visité toutes les villes.
+
+### 2. 2-opt
+
+On part d'un tour existant (généré par NN).
+On cherche deux arêtes dont l'échange réduit le coût total.
+On répète jusqu'à ce qu'aucun échange ne soit améliorant.
+
+### 3. Cheapest Insertion
+
+On commence avec un cycle initial à deux villes.
+À chaque étape, on insère la ville restante dont l'ajout augmente le moins le coût total.
+On répète jusqu'à inclure toutes les villes.
+
+---
+
 ## Paramètres CLI
 
 ```

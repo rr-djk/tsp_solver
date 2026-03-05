@@ -2,7 +2,23 @@ name: CI
 
 on:
   push:
+    paths:
+      - "**/*.cpp"
+      - "**/*.hpp"
+      - "include/**"
+      - "src/**"
+      - "tests/**"
+      - "Makefile"
+      - ".github/workflows/**"
   pull_request:
+    paths:
+      - "**/*.cpp"
+      - "**/*.hpp"
+      - "include/**"
+      - "src/**"
+      - "tests/**"
+      - "Makefile"
+      - ".github/workflows/**"
 
 jobs:
   test:
