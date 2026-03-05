@@ -23,11 +23,14 @@ Référence : https://en.wikipedia.org/wiki/Travelling_salesman_problem
 
 ## Prérequis
 
+**C++ :**
 - Système Linux
-- g++ 14
-- Support de C++23
-- Optionnel (pour reproduire les résultats de profiling) : `sudo apt install linux-tools-common linux-tools-generic valgrind`
-- Optionnel (pour les tests unitaires) : `sudo apt install libgtest-dev`
+- g++ 14, support C++23
+- Optionnel (profiling) : `sudo apt install linux-tools-common linux-tools-generic valgrind`
+- Optionnel (tests unitaires) : `sudo apt install libgtest-dev`
+
+**Python (visualisation) :**
+- Python 3.10+
 
 ## Build et exécution
 
@@ -40,25 +43,59 @@ make clean    # supprime le répertoire build/
 ### Exécution
 
 ```bash
-./build/tsp_parser <fichier.tsp>
+./build/tsp_parser --input-file <fichier.tsp> --algo <nn|2opt|insertion> --output-file <résultats.json> [options]
 ```
+
+**Options disponibles :**
+
+| Option | Description |
+|---|---|
+| `--input-file <path>` | Fichier `.tsp` TSPLIB à charger *(obligatoire)* |
+| `--algo <name>` | Algorithme : `nn`, `2opt`, `insertion` *(obligatoire)* |
+| `--output-file <path>` | Fichier JSON de sortie *(obligatoire)* |
+| `--all-start` | Exécute depuis chaque ville de départ |
+| `--quiet` | Réduit l'affichage terminal |
+| `--repeat <k>` | Répète l'exécution k fois (k ≥ 1) |
+| `--threads <t>` | Nombre de threads (1 ≤ t ≤ hardware_concurrency) |
+| `--time-limit <Ns>` | Limite de temps (ex : `10s`) |
 
 **Exemple :**
 
 ```bash
-./build/tsp_parser data/berlin52.tsp
+./build/tsp_parser --input-file data/berlin52.tsp --algo nn --output-file results/berlin52_nn.json
 ```
 
-**Sortie actuelle :**
+---
 
-```
-=== Évaluation TSP ===
-Nombre de villes    : 52
-Coût du tour        : 23741.1234
-Temps d'évaluation  : 42µs
+## Visualisation
+
+### Installation
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r scripts/requirements.txt
 ```
 
-Le programme génère un tour aléatoire sur les villes du fichier et affiche son coût euclidien total ainsi que le temps de calcul. Le tour est différent à chaque exécution.
+### Tracer un tour
+
+```bash
+python3 scripts/plot_tour.py results/berlin52_nn.json
+```
+
+Le script lit le fichier JSON produit par `tsp_solver`, charge les coordonnées
+depuis le fichier `.tsp` correspondant dans `data/`, et affiche le tour optimal.
+
+**Options :**
+
+| Option | Description |
+|---|---|
+| `--data-dir <dir>` | Dossier contenant les `.tsp` (défaut : `data/`) |
+| `--output <file>` | Sauvegarde en `.png` ou `.svg` au lieu d'ouvrir une fenêtre graphique |
+
+```bash
+python3 scripts/plot_tour.py results/berlin52_nn.json --output tour.png
+```
 
 ---
 
