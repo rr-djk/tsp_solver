@@ -34,7 +34,8 @@ static std::size_t find_start_index(const Map &map, std::size_t start_city_id) {
  */
 static std::size_t
 find_nearest_unvisited_city(const Map &map, std::size_t current_city_index,
-                            const std::vector<bool> &visited_cities) {
+                            const std::vector<bool> &visited_cities,
+                            int &distance_calls) {
   double nearest_city_distance = std::numeric_limits<double>::infinity();
   std::size_t nearest_city_index = 0;
 
@@ -42,6 +43,7 @@ find_nearest_unvisited_city(const Map &map, std::size_t current_city_index,
        ++candidate_index) {
     if (visited_cities[candidate_index])
       continue;
+    ++distance_calls;
     const double distance_to_candidate =
         map.distance(current_city_index, candidate_index);
     if (distance_to_candidate < nearest_city_distance) {
@@ -70,9 +72,11 @@ SolveResult NearestNeighborSolver::solve(const Map &map,
   visited_cities[current_city_index] = true;
   visit_order.push_back(static_cast<int>(current_city_index));
 
+  int distance_calls = 0;
+
   for (std::size_t step = 1; step < city_count; ++step) {
-    const std::size_t nearest_city_index =
-        find_nearest_unvisited_city(map, current_city_index, visited_cities);
+    const std::size_t nearest_city_index = find_nearest_unvisited_city(
+        map, current_city_index, visited_cities, distance_calls);
 
     visited_cities[nearest_city_index] = true;
     visit_order.push_back(static_cast<int>(nearest_city_index));
@@ -85,5 +89,5 @@ SolveResult NearestNeighborSolver::solve(const Map &map,
       std::chrono::steady_clock::now() - start_time);
 
   return SolveResult{"", "nearest_neighbor", std::move(tour), tour_cost,
-                     elapsed};
+                     elapsed, distance_calls};
 }

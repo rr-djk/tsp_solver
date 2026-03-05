@@ -23,6 +23,9 @@ struct SolveResult {
 
   /** Durée d'exécution de l'algorithme. */
   std::chrono::microseconds duration;
+
+  /** Combien de distances l’algorithme a calculées. */
+  int distance_calls;
 };
 
 #endif

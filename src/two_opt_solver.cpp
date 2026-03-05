@@ -31,8 +31,10 @@ inline void apply_2opt_swap(std::vector<int> &order, std::size_t i,
  * @param d Index interne de la ville d (successeur de c).
  * @return Delta de coût : négatif si l'échange est bénéfique.
  */
-inline double compute_2opt_delta(const Map &map, int a, int b, int c, int d) {
+inline double compute_2opt_delta(const Map &map, int a, int b, int c, int d,
+                                 int &distance_calls) {
   auto idx = [](int i) { return static_cast<std::size_t>(i); };
+  distance_calls += 4;
   return -map.distance(idx(a), idx(b)) - map.distance(idx(c), idx(d)) +
          map.distance(idx(a), idx(c)) + map.distance(idx(b), idx(d));
 }
@@ -63,7 +65,8 @@ time_limit_exceeded(const std::chrono::steady_clock::time_point &start_time,
  */
 std::chrono::microseconds improve_with_2opt(const Map &map,
                                             std::vector<int> &visit_order,
-                                            const SolveOptions &options) {
+                                            const SolveOptions &options,
+                                            int &distance_calls) {
   const auto start_time = std::chrono::steady_clock::now();
   const std::size_t city_count = visit_order.size();
 
@@ -88,7 +91,8 @@ std::chrono::microseconds improve_with_2opt(const Map &map,
 
         const double delta =
             compute_2opt_delta(map, visit_order[i], visit_order[next_i],
-                               visit_order[j], visit_order[next_j]);
+                               visit_order[j], visit_order[next_j],
+                               distance_calls);
 
         if (delta < -1e-12) {
           apply_2opt_swap(visit_order, i, j);
@@ -113,10 +117,11 @@ SolveResult TwoOptSolver::solve(const Map &map, const SolveOptions &options) {
   SolveResult nn_result = nn_solver.solve(map, options);
 
   std::vector<int> visit_order(nn_result.tour.getOrder());
-  const auto elapsed = improve_with_2opt(map, visit_order, options);
+  int distance_calls = 0;
+  const auto elapsed = improve_with_2opt(map, visit_order, options, distance_calls);
 
   Tour final_tour(visit_order);
   const double final_cost = cost(map, final_tour);
   return SolveResult{nn_result.file_name, "two_opt", std::move(final_tour),
-                     final_cost, elapsed};
+                     final_cost, elapsed, distance_calls};
 }
