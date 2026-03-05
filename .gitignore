@@ -4,6 +4,10 @@ build/
 # Fichiers d'apprentissage
 apprentissage/
 
+# Python
+.venv/
+__pycache__/
+
 # Editeur
 .cache/
 .clangd
