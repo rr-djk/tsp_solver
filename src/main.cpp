@@ -3,14 +3,21 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
-#include <numeric>
+#include <memory>
+#include <optional>
 #include <print>
-#include <random>
 #include <string_view>
+#include <vector>
 
-#include "evaluator.hpp"
+#include "cli_parser.hpp"
+#include "insertion_solver.hpp"
+#include "isolver.hpp"
+#include "json_writer.hpp"
 #include "map.hpp"
-#include "tour.hpp"
+#include "nearest_neighbor_solver.hpp"
+#include "solve_options.hpp"
+#include "solve_result.hpp"
+#include "two_opt_solver.hpp"
 
 [[noreturn]] static void print_help_and_exit() {
   std::cout
@@ -32,48 +39,79 @@
   std::exit(0);
 }
 
+static Map load_map_or_exit(const std::string &path) {
+  std::ifstream file(path);
+  if (!file) {
+    std::println(stderr, "Erreur à l'ouverture : {}", path);
+    std::exit(1);
+  }
+  Map map;
+  try {
+    file >> map;
+  } catch (const std::exception &e) {
+    std::println(stderr, "Erreur de lecture : {}", e.what());
+    std::exit(1);
+  }
+  return map;
+}
+
+static std::unique_ptr<ISolver> make_solver(const std::string &algo) {
+  if (algo == "nn")
+    return std::make_unique<NearestNeighborSolver>();
+  if (algo == "2opt")
+    return std::make_unique<TwoOptSolver>();
+  if (algo == "insertion")
+    return std::make_unique<InsertionSolver>();
+  std::println(stderr, "Algorithme inconnu : {}", algo);
+  std::exit(1);
+}
+
 int main(int argc, char *argv[]) {
   if (argc >= 2 && std::string_view(argv[1]) == "help")
     print_help_and_exit();
 
-  if (argc < 2) {
-    std::println(stderr, "Parametres manquants");
-    return 1;
+  const CliOptions opts = parse_args_or_exit(argc, argv);
+
+  const Map map = load_map_or_exit(opts.input_file);
+
+  SolveOptions solve_opts;
+  if (opts.time_limit_seconds.has_value())
+    solve_opts.time_limit = std::chrono::seconds(*opts.time_limit_seconds);
+
+  auto solver = make_solver(opts.algo);
+
+  std::vector<std::optional<std::size_t>> starts;
+  if (opts.all_start) {
+    for (const auto &city : map.getCities())
+      starts.push_back(static_cast<std::size_t>(city.getId()));
+  } else {
+    starts.push_back(std::nullopt);
   }
 
-  const std::string filename = argv[1];
-  std::println("Lecture du fichier : {}", filename);
+  std::optional<SolveResult> best;
 
-  Map map;
-  std::ifstream fichier_tsp(filename);
-  if (fichier_tsp.fail()) {
-    std::println(stderr, "Erreur a l'ouverture du fichier : {}", filename);
-    return 1;
+  for (int rep = 0; rep < opts.repeat; ++rep) {
+    for (const auto &start : starts) {
+      solve_opts.start_city_id = start;
+      SolveResult result = solver->solve(map, solve_opts);
+      result.file_name = opts.input_file;
+      if (!best.has_value() || result.cost < best->cost)
+        best = std::move(result);
+    }
   }
+
+  if (!opts.quiet) {
+    std::println("Algorithme : {}", best->algo_name);
+    std::println("Coût       : {:.4f}", best->cost);
+    std::println("Durée      : {}", best->duration);
+  }
+
   try {
-    fichier_tsp >> map;
+    write_solve_result_json(*best, opts.output_file);
   } catch (const std::exception &e) {
-    std::println(stderr, "Erreur a la creation de la carte : {}", e.what());
+    std::println(stderr, "Erreur d'écriture JSON : {}", e.what());
     return 1;
   }
-
-  const std::size_t map_size = map.size();
-  std::vector<int> order(map_size);
-  std::iota(order.begin(), order.end(), 0);
-  std::shuffle(order.begin(), order.end(),
-               std::mt19937{std::random_device{}()});
-  Tour tour(order);
-
-  using steady_clock = std::chrono::steady_clock;
-  const auto start = steady_clock::now();
-  const double total_cost = cost(map, tour);
-  const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
-      steady_clock::now() - start);
-
-  std::println("=== Évaluation TSP ===");
-  std::println("Nombre de villes    : {}", map_size);
-  std::println("Coût du tour        : {:.4f}", total_cost);
-  std::println("Temps d'évaluation  : {}", elapsed);
 
   return 0;
 }
