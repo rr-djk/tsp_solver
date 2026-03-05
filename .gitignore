@@ -12,3 +12,6 @@ __pycache__/
 .cache/
 .clangd
 compile_commands.json
+
+# Fichiers d'execution locale
+results/
