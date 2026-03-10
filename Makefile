@@ -12,7 +12,11 @@ TEST_EXEC = $(BUILD_DIR)/test_tsp
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SOURCES))
 
-.PHONY: all clean test valgrind
+PROFILE_FLAGS   = -std=c++23 -O2 -g -Iinclude -I/usr/local/include
+PROFILE_EXEC    = $(BUILD_DIR)/tsp_parser_profile
+PROFILE_OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/profile_%.o,$(SOURCES))
+
+.PHONY: all clean test valgrind profile
 
 all: $(EXEC)
 
@@ -37,6 +41,14 @@ $(TEST_EXEC): $(LIB_OBJECTS) $(TEST_OBJECTS) | $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+profile: $(PROFILE_EXEC)
+
+$(PROFILE_EXEC): $(PROFILE_OBJECTS) | $(BUILD_DIR)
+	$(CXX) $(PROFILE_FLAGS) -o $@ $^ -lpthread
+
+$(BUILD_DIR)/profile_%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
+	$(CXX) $(PROFILE_FLAGS) -c $< -o $@
 
 valgrind: $(TEST_EXEC)
 	valgrind --leak-check=full --error-exitcode=1 ./$(TEST_EXEC)
