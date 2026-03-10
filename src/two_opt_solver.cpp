@@ -122,6 +122,9 @@ SolveResult TwoOptSolver::solve(const Map &map, const SolveOptions &options) {
 
   Tour final_tour(visit_order);
   const double final_cost = cost(map, final_tour);
-  return SolveResult{nn_result.file_name, "two_opt", std::move(final_tour),
-                     final_cost, elapsed, distance_calls};
+  SolveResult result{nn_result.file_name, "two_opt", std::move(final_tour),
+                     final_cost, elapsed, distance_calls, 0, 0};
+  if (options.time_limit.has_value() && elapsed >= *options.time_limit)
+    result.status = SolveStatus::timeout;
+  return result;
 }

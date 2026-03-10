@@ -5,6 +5,13 @@
 #include <chrono>
 #include <string>
 
+/** @brief Statut de terminaison d'une résolution TSP. */
+enum class SolveStatus {
+  ok,      ///< Résolution complète sans interruption.
+  timeout, ///< Interrompue par --time-limit avant convergence.
+  error,   ///< Tour invalide détecté après résolution.
+};
+
 /**
  * @brief Résultat produit par un solveur TSP après résolution.
  */
@@ -26,6 +33,15 @@ struct SolveResult {
 
   /** Combien de distances l’algorithme a calculées. */
   int distance_calls;
+
+  /** Nombre de passes ou d’étapes de construction effectuées. */
+  int iterations;
+
+  /** Nombre d’améliorations appliquées (swaps, insertions bénéfiques). */
+  int improvements;
+
+  /** Statut de terminaison de la résolution. */
+  SolveStatus status{SolveStatus::ok};
 };
 
 #endif

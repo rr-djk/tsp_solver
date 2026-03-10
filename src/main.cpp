@@ -111,6 +111,11 @@ int main(int argc, char *argv[]) {
   if (best.has_value())
     best->file_name = opts.input_file;
 
+  if (best.has_value() && !best->tour.is_valid(map.size())) {
+    std::println(stderr, "Erreur : tour invalide produit par {}", best->algo_name);
+    best->status = SolveStatus::error;
+  }
+
   if (!opts.quiet) {
     std::println("Algorithme : {}", best->algo_name);
     std::println("Coût       : {:.4f}", best->cost);
@@ -118,7 +123,7 @@ int main(int argc, char *argv[]) {
   }
 
   try {
-    write_solve_result_json(*best, opts.output_file);
+    write_solve_result_json(*best, opts, opts.output_file);
   } catch (const std::exception &e) {
     std::println(stderr, "Erreur d'écriture JSON : {}", e.what());
     return 1;

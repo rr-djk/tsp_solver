@@ -189,7 +189,7 @@ SolveResult InsertionSolver::solve(const Map &map, const SolveOptions &options) 
       order.push_back(static_cast<int>(i));
     Tour final_tour(order);
     return SolveResult{"", "cheapest_insertion", std::move(final_tour), 0.0,
-                       std::chrono::microseconds{0}, 0};
+                       std::chrono::microseconds{0}, 0, 0, 0};
   }
 
   const std::size_t start_index =
@@ -217,6 +217,9 @@ SolveResult InsertionSolver::solve(const Map &map, const SolveOptions &options) 
 
   Tour final_tour(visit_order);
   const double final_cost = cost(map, final_tour);
-  return SolveResult{"", "cheapest_insertion", std::move(final_tour),
-                     final_cost, elapsed, distance_calls};
+  SolveResult result{"", "cheapest_insertion", std::move(final_tour),
+                     final_cost, elapsed, distance_calls, 0, 0};
+  if (options.time_limit.has_value() && elapsed >= *options.time_limit)
+    result.status = SolveStatus::timeout;
+  return result;
 }
