@@ -30,6 +30,21 @@ private:
   std::vector<City> cities;
 
   /**
+   * @brief Matrice de distances précalculées, stockée en tableau plat
+   *        row-major : dist_matrix_[i * n + j] = distance(i, j).
+   * @note Calculée une seule fois après le chargement des villes.
+   *       Taille : n² doubles (symétrique, diagonale nulle).
+   */
+  std::vector<double> dist_matrix_;
+
+  /**
+   * @brief Précalcule toutes les distances entre paires de villes et les
+   *        stocke dans dist_matrix_.
+   * @note Doit être appelée après que cities est entièrement rempli.
+   */
+  void build_dist_matrix();
+
+  /**
    * @brief Lit et parse un fichier TSPLIB dans la carte.
    * @param is Flux d'entrée positionné au début du fichier .tsp.
    * @param map Carte à remplir avec les villes lues.

@@ -6,8 +6,26 @@
 
 const std::vector<City> &Map::getCities() const { return cities; }
 
+/**
+ * @brief Précalcule la matrice de distances en O(n²).
+ * Pour chaque paire (i, j), calcule la distance euclidienne une seule fois
+ * et la stocke dans dist_matrix_[i * n + j] et dist_matrix_[j * n + i]
+ * (symétrie exploitée pour réduire le nombre d'appels à distanceTo).
+ */
+void Map::build_dist_matrix() {
+  const std::size_t n = cities.size();
+  dist_matrix_.assign(n * n, 0.0);
+  for (std::size_t i = 0; i < n; ++i) {
+    for (std::size_t j = i + 1; j < n; ++j) {
+      const double d = cities[i].distanceTo(cities[j]);
+      dist_matrix_[i * n + j] = d;
+      dist_matrix_[j * n + i] = d;
+    }
+  }
+}
+
 double Map::distance(std::size_t index_city_a, std::size_t index_city_b) const {
-  return cities.at(index_city_a).distanceTo(cities.at(index_city_b));
+  return dist_matrix_[index_city_a * cities.size() + index_city_b];
 }
 
 std::size_t Map::size() const { return cities.size(); }
@@ -37,6 +55,8 @@ std::istream &operator>>(std::istream &is, Map &map) {
     map.cities.emplace_back(id, x, y);
   if (map.cities.size() != dimension)
     throw std::runtime_error("Nombre de villes != DIMENSION");
+
+  map.build_dist_matrix();
 
   return is;
 }
