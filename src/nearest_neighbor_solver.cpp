@@ -88,6 +88,7 @@ SolveResult NearestNeighborSolver::solve(const Map &map,
   const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
       std::chrono::steady_clock::now() - start_time);
 
-  return SolveResult{"", "nearest_neighbor", std::move(tour), tour_cost,
-                     elapsed, distance_calls};
+  SolveResult result{"", "nearest_neighbor", std::move(tour), tour_cost,
+                     elapsed, distance_calls, 0, 0};
+  return result;
 }
