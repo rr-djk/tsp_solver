@@ -1,4 +1,5 @@
 #include "json_writer.hpp"
+#include "cli_options.hpp"
 #include "solve_result.hpp"
 #include <cstddef>
 #include <filesystem>
@@ -94,9 +95,27 @@ public:
     os_ << value;
   }
 
+  void key_bool(std::string_view key, bool value) {
+    write_key(key);
+    os_ << (value ? "true" : "false");
+  }
+
   void key_int_array(std::string_view key, const std::vector<int> &v) {
     write_key(key);
     write_int_array(os_, v);
+  }
+
+  void begin_nested_object(std::string_view key) {
+    write_key(key);
+    os_ << "{\n";
+    indent_ += 2;
+    first_ = true;
+  }
+
+  void end_nested_object() {
+    indent_ -= 2;
+    os_ << "\n" << std::string(static_cast<std::size_t>(indent_), ' ') << "}";
+    first_ = false;
   }
 
 private:
@@ -150,6 +169,7 @@ static double micros_to_ms(std::chrono::microseconds us) {
 // ---------------------------------------------------------------------------
 
 void write_solve_result_json(const SolveResult &r,
+                             const CliOptions &opts,
                              const fs::path &user_output_path) {
 
   fs::path out_path = resolve_output_path(user_output_path);
@@ -158,9 +178,28 @@ void write_solve_result_json(const SolveResult &r,
 
   out << std::fixed << std::setprecision(6);
 
+  static auto status_str = [](SolveStatus s) -> std::string_view {
+    switch (s) {
+    case SolveStatus::ok:      return "ok";
+    case SolveStatus::timeout: return "timeout";
+    case SolveStatus::error:   return "error";
+    }
+    return "error";
+  };
+
   json::ObjectWriter w(out);
   w.begin_object();
 
+  w.begin_nested_object("config");
+  w.key_string("algo", opts.algo);
+  w.key_int("threads", opts.threads);
+  w.key_int("repeat", opts.repeat);
+  w.key_bool("all_start", opts.all_start);
+  if (opts.time_limit_seconds.has_value())
+    w.key_int("time_limit_s", *opts.time_limit_seconds);
+  w.end_nested_object();
+
+  w.key_string("status", status_str(r.status));
   w.key_string("file_name", r.file_name);
   w.key_string("algo_name", r.algo_name);
 
