@@ -103,6 +103,14 @@ make clean    # supprime le répertoire build/
 
 ## Algorithmes
 
+### Comparaison visuelle — berlin52 (52 villes)
+
+| NN — coût 8 980 | NN + 2-opt — coût 7 969 |
+|:---:|:---:|
+| ![Tour NN](images/berlin52_nn.png) | ![Tour 2-opt](images/berlin52_2opt.png) |
+
+Le 2-opt élimine les croisements du tour NN, réduisant le coût de ~11 %.
+
 | Algorithme | Clé CLI | Complexité par passe | Description |
 |---|---|---|---|
 | Nearest Neighbor | `nn` | O(n²) | Heuristique gloutonne : visite toujours la ville la plus proche non visitée |
