@@ -59,10 +59,17 @@ make clean    # supprime le répertoire build/
 | `--threads <t>` | Nombre de threads (1 ≤ t ≤ hardware_concurrency) |
 | `--time-limit <Ns>` | Limite de temps (ex : `10s`) |
 
-**Exemple :**
+**Exemples :**
 
 ```bash
+# Exécution simple
 ./build/tsp_parser --input-file data/berlin52.tsp --algo nn --output-file results/berlin52_nn.json
+
+# Parallèle : toutes les villes de départ sur 4 threads (all-start × threads)
+./build/tsp_parser --input-file data/berlin52.tsp --algo 2opt --all-start --threads 4 --output-file results/berlin52_2opt.json
+
+# Grosse instance avec limite de temps et parallélisation
+./build/tsp_parser --input-file data/pla7397.tsp --algo nn --all-start --threads 8 --time-limit 30s --output-file results/pla7397_nn.json
 ```
 
 ---
