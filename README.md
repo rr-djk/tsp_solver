@@ -59,11 +59,49 @@ Le projet est structuré autour de plusieurs composants principaux :
 
 ## Build
 
+### Build natif (Linux)
+
 ```bash
 make          # compile le binaire dans build/tsp_parser
 make test     # compile et exécute la suite de tests GTest
 make clean    # supprime le répertoire build/
 ```
+
+### Docker (tous OS — Windows, macOS, Linux)
+
+> **Seul prérequis** : [Docker](https://docs.docker.com/get-docker/) installé.
+> Aucun compilateur, bibliothèque ou dépendance C++ n'est nécessaire sur la machine hôte.
+
+**Construire l'image** (compile le projet et exécute les tests automatiquement) :
+
+```bash
+docker build -t tsp-solver .
+```
+
+**Lancer le solveur** :
+
+```bash
+# Afficher l'aide
+docker run --rm tsp-solver
+
+# Exécution simple (résultat affiché dans le terminal)
+docker run --rm tsp-solver \
+  --input-file data/berlin52.tsp --algo nn --output-file results/out.json
+
+# Récupérer le fichier JSON sur la machine hôte
+docker run --rm -v "$(pwd)/results:/app/results" tsp-solver \
+  --input-file data/berlin52.tsp --algo 2opt --all-start --threads 4 \
+  --output-file results/berlin52_2opt.json
+```
+
+**Avec Docker Compose** (monte automatiquement `results/`) :
+
+```bash
+docker compose run --rm tsp-solver \
+  --input-file data/berlin52.tsp --algo nn --output-file results/berlin52_nn.json
+```
+
+> **Note sur la visualisation** : Python n'est pas inclus dans l'image Docker afin de garder celle-ci légère et focalisée sur le solveur C++. Pour générer les graphiques, installez Python localement et suivez la procédure décrite dans la section [Visualisation](#visualisation) ci-dessous.
 
 ---
 

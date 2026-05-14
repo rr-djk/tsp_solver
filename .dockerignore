@@ -1,0 +1,30 @@
+# Artifacts de compilation
+build/
+
+# Environnement virtuel Python
+.venv/
+__pycache__/
+
+# Éditeur / IDE
+.cache/
+.clangd
+compile_commands.json
+
+# Résultats locaux
+results/
+
+# Notes d'apprentissage (non nécessaires pour la compilation)
+apprentissage/
+
+# Git
+.git/
+.github/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Images & rapports (documentation uniquement)
+images/
+*.md

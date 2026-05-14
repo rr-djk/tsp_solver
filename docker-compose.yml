@@ -1,0 +1,7 @@
+services:
+  tsp-solver:
+    build: .
+    container_name: tsp-solver
+    volumes:
+      # Monte le dossier results/ local pour récupérer les fichiers JSON
+      - ./results:/app/results
