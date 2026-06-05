@@ -28,16 +28,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-          g++-14 make valgrind libgtest-dev cmake
-
-      - name: Set compiler to g++-14
-        run: |
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
-          sudo update-alternatives --set g++ /usr/bin/g++-14
+      - name: Setup Environment
+        uses: ./.github/actions/setup
 
       - name: Build
         run: make -B
@@ -57,16 +49,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-          g++-14 make valgrind libgtest-dev cmake
-
-      - name: Set compiler to g++-14
-        run: |
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
-          sudo update-alternatives --set g++ /usr/bin/g++-14
+      - name: Setup Environment
+        uses: ./.github/actions/setup
 
       - name: Download the build artifact
         if: ${{ !env.ACT }}
@@ -89,16 +73,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-          g++-14 make valgrind libgtest-dev cmake
-
-      - name: Set compiler to g++-14
-        run: |
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
-          sudo update-alternatives --set g++ /usr/bin/g++-14
+      - name: Setup Environment
+        uses: ./.github/actions/setup
 
       - name: Download the build artifact
         if: ${{ !env.ACT }}
