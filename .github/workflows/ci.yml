@@ -22,7 +22,7 @@ on:
 
 jobs:
   compile:
-    name: Build and test the project
+    name: Build the project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -41,5 +41,71 @@ jobs:
       - name: Build
         run: make -B
 
-      - name: Run tests
+      - name: Upload the build artifact
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_artifact
+          path: build/
+
+  memory_test:
+    name: Run memory test with valgrind
+    needs: compile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 make valgrind libgtest-dev cmake
+
+      - name: Set compiler to g++-14
+        run: |
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+          sudo update-alternatives --set g++ /usr/bin/g++-14
+
+      - name: Download the build artifact
+        if: ${{ !env.ACT }}
+        uses: actions/download-artifact@v4
+        with:
+          name: build_artifact
+
+      - name: Local build artifact for act
+        if: ${{ env.ACT }}
+        run: make
+
+      - name: Run valgrind test
         run: make valgrind
+
+  unit_test:
+    name: Run unit test with GTest
+    needs: compile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 make valgrind libgtest-dev cmake
+
+      - name: Set compiler to g++-14
+        run: |
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+          sudo update-alternatives --set g++ /usr/bin/g++-14
+
+      - name: Download the build artifact
+        if: ${{ !env.ACT }}
+        uses: actions/download-artifact@v4
+        with:
+          name: build_artifact
+
+      - name: Local build artifact for act
+        if: ${{ env.ACT }}
+        run: make
+
+      - name: Run unit test
+        run: make test
