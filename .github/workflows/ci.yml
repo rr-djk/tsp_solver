@@ -21,9 +21,9 @@ on:
       - ".github/workflows/**"
 
 jobs:
-  test:
+  compile:
+    name: Build and test the project
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,8 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y g++-14 make valgrind
-          sudo apt-get install -y libgtest-dev cmake
+          sudo apt-get install -y g++-14 make valgrind libgtest-dev cmake
 
       - name: Set compiler to g++-14
         run: |
@@ -42,5 +41,5 @@ jobs:
       - name: Build
         run: make -B
 
-      - name: Run tests with Valgrind
+      - name: Run tests
         run: make valgrind
