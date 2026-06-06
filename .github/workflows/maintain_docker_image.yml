@@ -53,6 +53,7 @@ jobs:
 
       - name: Delete old package versions
         uses: actions/delete-package-versions@v5
+        continue-on-error: true
         with:
           package-name: ${{ env.IMAGE_NAME }}
           package-type: 'container'
