@@ -9,7 +9,7 @@ on:
       - "src/**"
       - "tests/**"
       - "Makefile"
-      - ".github/workflows/**"
+      - ".github/workflows/ci.yml"
   pull_request:
     paths:
       - "**/*.cpp"
@@ -18,18 +18,25 @@ on:
       - "src/**"
       - "tests/**"
       - "Makefile"
-      - ".github/workflows/**"
+      - ".github/workflows/ci.yml"
+
+permissions:
+  contents: read
+  packages: read
 
 jobs:
   compile:
     name: Build the project
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}/ci:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Setup Environment
-        uses: ./.github/actions/setup
 
       - name: Build
         run: make -B
@@ -45,12 +52,15 @@ jobs:
     name: Run memory test with valgrind
     needs: compile
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}/ci:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Setup Environment
-        uses: ./.github/actions/setup
 
       - name: Download the build artifact
         if: ${{ !env.ACT }}
@@ -69,12 +79,15 @@ jobs:
     name: Run unit test with GTest
     needs: compile
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}/ci:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Setup Environment
-        uses: ./.github/actions/setup
 
       - name: Download the build artifact
         if: ${{ !env.ACT }}
