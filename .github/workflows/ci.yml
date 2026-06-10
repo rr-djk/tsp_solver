@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    paths:
+    paths: &shared_paths
       - "**/*.cpp"
       - "**/*.hpp"
       - "include/**"
@@ -11,14 +11,7 @@ on:
       - "Makefile"
       - ".github/workflows/ci.yml"
   pull_request:
-    paths:
-      - "**/*.cpp"
-      - "**/*.hpp"
-      - "include/**"
-      - "src/**"
-      - "tests/**"
-      - "Makefile"
-      - ".github/workflows/ci.yml"
+    paths: *shared_paths
 
 permissions:
   contents: read
