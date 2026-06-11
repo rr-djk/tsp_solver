@@ -66,13 +66,13 @@ jobs:
             ' security-report.json)
 
             cat << EOF > issue-body.md
-## Vulnérabilités détectées dans \`$REPO_NAME\`
-
-$VULNS_MD
-
----
-*Rapport généré automatiquement le $(date +'%Y-%m-%d')*
-EOF
+            ## Vulnérabilités détectées dans \`$REPO_NAME\`
+            
+            $VULNS_MD
+            
+            ---
+            *Rapport généré automatiquement le $(date +'%Y-%m-%d')*
+            EOF
 
             gh issue create \
               --title "⚠️ Security Report - $REPO_NAME - $(date +'%Y-%m-%d')" \
