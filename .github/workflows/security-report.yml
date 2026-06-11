@@ -1,0 +1,85 @@
+name: Security Report
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'                         # Tous les lundis à 9h
+  workflow_dispatch:
+
+jobs:
+  security-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      security-events: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Query GraphQL
+        run: |
+          OWNER="${{ github.repository_owner }}"
+          REPO="${GITHUB_REPOSITORY#*/}"
+
+          QUERY=$(jq -n \
+            --arg owner "$OWNER" \
+            --arg repo "$REPO" \
+            '{query: "query { repository(owner: \($owner), name: \($repo)) { name vulnerabilityAlerts(first: 100, states: OPEN) { nodes { createdAt securityVulnerability { severity package { name } vulnerableVersionRange advisory { ghsaId summary } } } } } }"}')
+
+          curl -s -X POST https://api.github.com/graphql \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$QUERY" \
+            > security-report.json
+
+      - name: Create security label if missing
+        run: |
+          gh label create security \
+            --color "FF0000" \
+            --description "Security vulnerabilities" \
+            2>/dev/null || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Issue if vulnerabilities found
+        run: |
+          if jq -e \
+            '.data.repository.vulnerabilityAlerts.nodes | length > 0' \
+            security-report.json > /dev/null 2>&1; then
+
+            REPO_NAME="${GITHUB_REPOSITORY#*/}"
+
+            VULNS_MD=$(jq -r '
+              .data.repository.vulnerabilityAlerts.nodes |
+              "| Date | Package | Sévérité | " +
+              "Version Vulnérable | ID GHSA | Description |",
+              "| --- | --- | --- | --- | --- | --- |",
+              (.[] |
+                "| \(.createdAt[0:10]) | " +
+                "`\(.securityVulnerability.package.name)` | " +
+                "**\(.securityVulnerability.severity)** | " +
+                "`\(.securityVulnerability.vulnerableVersionRange)` | " +
+                "\(.securityVulnerability.advisory.ghsaId) | " +
+                "\(.securityVulnerability.advisory.summary) |"
+              )
+            ' security-report.json)
+
+            cat << EOF > issue-body.md
+## Vulnérabilités détectées dans \`$REPO_NAME\`
+
+$VULNS_MD
+
+---
+*Rapport généré automatiquement le $(date +'%Y-%m-%d')*
+EOF
+
+            gh issue create \
+              --title "⚠️ Security Report - $REPO_NAME - $(date +'%Y-%m-%d')" \
+              --body-file issue-body.md \
+              --label "security"
+          else
+            echo "Aucune vulnérabilité ouverte détectée."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
