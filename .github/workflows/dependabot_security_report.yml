@@ -94,7 +94,7 @@ jobs:
             
             ---
             *Rapport généré automatiquement le $(date +'%Y-%m-%d')*
-            EOF
+          EOF
 
             gh issue create \
               --title "⚠️ Security Report - $REPO_NAME - $(date +'%Y-%m-%d')" \
