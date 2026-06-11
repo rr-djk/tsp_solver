@@ -17,21 +17,43 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Query GraphQL
+      - name: Query GraphQL (paginated)
         run: |
           OWNER="${{ github.repository_owner }}"
           REPO="${GITHUB_REPOSITORY#*/}"
 
-          QUERY=$(jq -n \
-            --arg owner "$OWNER" \
-            --arg repo "$REPO" \
-            '{query: "query { repository(owner: \($owner), name: \($repo)) { name vulnerabilityAlerts(first: 100, states: OPEN) { nodes { createdAt securityVulnerability { severity package { name } vulnerableVersionRange advisory { ghsaId summary } } } } } }"}')
+          cursor="null"
+          page=0
 
-          curl -s -X POST https://api.github.com/graphql \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d "$QUERY" \
-            > security-report.json
+          while true; do
+            if [ "$cursor" = "null" ]; then
+              cursor_json="null"
+            else
+              cursor_json="\"$cursor\""
+            fi
+
+            QUERY=$(jq -n \
+              --arg owner "$OWNER" \
+              --arg repo "$REPO" \
+              --argjson cursor "$cursor_json" \
+              '{query: "query($owner: String!, $repo: String!, $cursor: String) { repository(owner: $owner, name: $repo) { vulnerabilityAlerts(first: 100, states: OPEN, after: $cursor) { nodes { createdAt securityVulnerability { severity package { name } vulnerableVersionRange advisory { ghsaId summary } } } pageInfo { hasNextPage endCursor } } } }", variables: {owner: $owner, repo: $repo, cursor: $cursor}}')
+
+            curl -s -X POST https://api.github.com/graphql \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Content-Type: application/json" \
+              -d "$QUERY" \
+              > "page-$page.json"
+
+            if ! jq -e '.data.repository.vulnerabilityAlerts.pageInfo.hasNextPage' "page-$page.json" > /dev/null 2>&1; then
+              break
+            fi
+
+            cursor=$(jq -r '.data.repository.vulnerabilityAlerts.pageInfo.endCursor' "page-$page.json")
+            page=$((page + 1))
+          done
+
+          jq -s '{nodes: [.[].data.repository.vulnerabilityAlerts.nodes[]]}' page-*.json > security-report.json
+          rm -f page-*.json
 
       - name: Create security label if missing
         run: |
@@ -44,14 +66,14 @@ jobs:
 
       - name: Create Issue if vulnerabilities found
         run: |
-          if jq -e \
-            '.data.repository.vulnerabilityAlerts.nodes | length > 0' \
-            security-report.json > /dev/null 2>&1; then
+          if jq -e '.nodes | length > 0' security-report.json > /dev/null 2>&1; then
 
             REPO_NAME="${GITHUB_REPOSITORY#*/}"
 
             VULNS_MD=$(jq -r '
-              .data.repository.vulnerabilityAlerts.nodes |
+              .nodes |
+              sort_by(.createdAt) | reverse |
+              sort_by(.securityVulnerability.severity | {CRITICAL: 0, HIGH: 1, MODERATE: 2, LOW: 3}[.]) |
               "| Date | Package | Sévérité | " +
               "Version Vulnérable | ID GHSA | Description |",
               "| --- | --- | --- | --- | --- | --- |",
