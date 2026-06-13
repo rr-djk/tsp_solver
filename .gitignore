@@ -15,3 +15,6 @@ compile_commands.json
 
 # Fichiers d'execution locale
 results/
+
+# CodeQL
+codeql-db/
