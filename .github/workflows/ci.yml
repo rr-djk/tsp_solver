@@ -1,6 +1,9 @@
 name: CI
 
 on:
+  workflow_run:
+    workflows: ["Publish and Maintain CI Docker Image"]
+    types: [completed]
   push:
     paths: &shared_paths
       - "**/*.cpp"
@@ -19,6 +22,7 @@ permissions:
 
 jobs:
   compile:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     name: Build the project
     runs-on: ubuntu-latest
     container:
